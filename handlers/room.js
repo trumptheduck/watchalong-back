@@ -64,11 +64,6 @@ exports.registerHandler = (io)=>{
         currentRoom.members.splice(index,1);
         console.log("Members: ",currentRoom.members);
       }
-      hasJoined = false;
-      socket.leave(currentRoom.id);
-      currentRoom = null;
-      currentUser = null;
-      socket.emit("room:joinStatus:post",hasJoined);
     })
     socket.on("room:create",(name,id)=>{
       if (!hasJoined) {

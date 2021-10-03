@@ -29,6 +29,7 @@ app.get('/', function(req, res) {
 })
 
 roomHandler.registerHandler(io);
+/////////// PUPPETEER //////////////////
 
 ///////////////////////////////////////////////////////////////
 http.listen(httpPort, function () {

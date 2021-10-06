@@ -124,7 +124,6 @@ exports.registerHandler = (io)=>{
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
     })
     socket.on('room:playlist:next',()=>{
-      if (currentRoom.playlist.length > 0) {
         currentRoom.nowPlaying = currentRoom.playlist[0];
         currentRoom.playlist.splice(0,1);
         currentRoom.members.forEach(member => {
@@ -137,7 +136,6 @@ exports.registerHandler = (io)=>{
         })
         socket.to(currentRoom.id).emit("room:playlist:play",currentRoom.nowPlaying);
         socket.to(currentRoom.id).emit("room:data:post",currentRoom);
-      }
     })
     socket.on("room:message:post", (msg)=> {
       socket.to(currentRoom.id).emit("room:message:get", {

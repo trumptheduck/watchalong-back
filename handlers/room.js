@@ -1,7 +1,3 @@
-//CONSTANTS
-const TIMEOUT_DURATION = 600000;
-
-////////////////////////////////
 
 const rooms = [];
 
@@ -108,9 +104,14 @@ exports.registerHandler = (io)=>{
     socket.on("room:playlist:get",() => {
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
     })
-    socket.on('room:playlist:add',(data)=>{
-      currentRoom.playlist.push({video: data, host: currentUser.id});
+    socket.on('room:playlist:add',(data,type)=>{
+      if (type == 'youtube') {
+        currentRoom.playlist.push({video: data,type: "youtube", host: currentUser.id});
+      } else {
+        currentRoom.playlist.push({video: {url: data.url, title: data.title},type: type, host: currentUser.id});
+      }
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
+      console.log(currentRoom);
     })
     socket.on('room:playlist:delete',(index)=>{
       currentRoom.playlist.splice(index,1);
@@ -123,18 +124,20 @@ exports.registerHandler = (io)=>{
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
     })
     socket.on('room:playlist:next',()=>{
-      currentRoom.nowPlaying = currentRoom.playlist[0];
-      currentRoom.playlist.splice(0,1);
-      currentRoom.members.forEach(member => {
-        if (currentRoom.nowPlaying.host == member.id) {
-          member.isHost = true;
-          currentRoom.host = member;
-        } else {
-          member.isHost = false;
-        }
-      })
-      socket.to(currentRoom.id).emit("room:playlist:play",currentRoom.nowPlaying);
-      socket.to(currentRoom.id).emit("room:data:post",currentRoom);
+      if (currentRoom.playlist.length > 0) {
+        currentRoom.nowPlaying = currentRoom.playlist[0];
+        currentRoom.playlist.splice(0,1);
+        currentRoom.members.forEach(member => {
+          if (currentRoom.nowPlaying.host == member.id) {
+            member.isHost = true;
+            currentRoom.host = member;
+          } else {
+            member.isHost = false;
+          }
+        })
+        socket.to(currentRoom.id).emit("room:playlist:play",currentRoom.nowPlaying);
+        socket.to(currentRoom.id).emit("room:data:post",currentRoom);
+      }
     })
     socket.on("room:message:post", (msg)=> {
       socket.to(currentRoom.id).emit("room:message:get", {
@@ -163,21 +166,6 @@ exports.registerHandler = (io)=>{
       if (hasJoined) {
         console.log("Username: ",currentUser.name," | Room: ", currentRoom.id);
         currentUser.online = false;
-        // currentUser.timeout = setTimeout(()=>{
-        //   console.log("User timed out: ",currentUser.name)
-        //   if (currentRoom.members.length < 2) {
-        //     rooms.splice(rooms.indexOf(currentRoom),1);
-        //     console.log("Rooms: ", rooms);
-        //   } else {
-        //     var member = currentRoom.members.find(member => member.id == currentUser.id);
-        //     var index = currentRoom.members.indexOf(member);
-        //     if (member.isAdmin) {
-        //       currentRoom.members[index+1].isAdmin = true;
-        //     }
-        //     currentRoom.members.splice(index,1);
-        //     console.log("Members: ",currentRoom.members);
-        //   }
-        // },TIMEOUT_DURATION)
       }
     })
   });

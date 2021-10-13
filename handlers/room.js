@@ -21,7 +21,6 @@ class User {
     this.isHost = false;
     this.isAdmin = false;
     this.online = true;
-    this.timeout = null;
   }
 }
 exports.registerHandler = (io)=>{
@@ -105,11 +104,7 @@ exports.registerHandler = (io)=>{
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
     })
     socket.on('room:playlist:add',(data,type)=>{
-      if (type == 'youtube') {
-        currentRoom.playlist.push({video: data,type: "youtube", host: currentUser.id});
-      } else {
-        currentRoom.playlist.push({video: {url: data.url, title: data.title},type: type, host: currentUser.id});
-      }
+      currentRoom.playlist.push({video: data,type: type, host: currentUser.id});
       socket.to(currentRoom.id).emit("room:data:post",currentRoom);
       console.log(currentRoom);
     })
@@ -149,6 +144,7 @@ exports.registerHandler = (io)=>{
     socket.on("room:data:update",(time,status)=>{
       currentUser.time = time;
       currentUser.status = status;
+      socket.emit("room:data:post",currentRoom)
     })
     socket.on("room:id:get",()=>{
       socket.emit("room:id:post",currentUser.id)

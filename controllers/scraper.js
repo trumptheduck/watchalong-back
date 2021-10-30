@@ -4,7 +4,6 @@ var isBrowserReady = false;
 (async () => {
   global_browser = await puppeteer.launch({
     args: ["--no-sandbox"],
-    executablePath: "/usr/bin/google-chrome"
 });
   isBrowserReady = true;
 })();

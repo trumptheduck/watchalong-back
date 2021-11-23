@@ -147,7 +147,6 @@ exports.registerHandler = (io)=>{
       if (currentUser?.time !== undefined) {
         currentUser.time = data.time;
         currentUser.status = data.status;
-        console.log(currentUser.time);
         socket.emit("room:data:post",currentRoom)
       } else {
         socket.emit("room:joinStatus:post",hasJoined)
@@ -159,7 +158,6 @@ exports.registerHandler = (io)=>{
     socket.emit("message", "Connected!");
     // handle the event sent with socket.send()
     socket.on("message", (data) => {
-      console.log(data);
     });
     //Handle disconnection
     socket.on('disconnect',()=>{

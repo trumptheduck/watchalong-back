@@ -23,6 +23,13 @@ class User {
     this.online = true;
   }
 }
+class Message {
+  constructor(name,content,isSelf) {
+    this.name = name;
+    this.content = content;
+    this.isSelf = isSelf;
+  } 
+}
 exports.registerHandler = (io)=>{
   io.on("connection", socket => {
     console.log("Socket connected! | UUID:",socket.id)
@@ -155,9 +162,11 @@ exports.registerHandler = (io)=>{
     socket.on("room:id:get",()=>{
       socket.emit("room:id:post",currentUser.id)
     })
-    socket.emit("message", "Connected!");
-    // handle the event sent with socket.send()
-    socket.on("message", (data) => {
+    socket.on("message:send", (content) => {
+      if (hasJoined&&currentUser?.name !== undefined&&currentRoom?.id !== undefined) {
+        var message = new Message(currentUser.name, content, false);
+        socket.to(currentRoom.id).emit("message:receive",message);
+      }
     });
     //Handle disconnection
     socket.on('disconnect',()=>{
